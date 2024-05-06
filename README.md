@@ -77,4 +77,4 @@ npm install
 
 ## Contributors
 
-This project is maintained by [Mochamad GalIh](https://github.com/MCHMDGALIH).
+This project is maintained by [Mochamad Galih](https://github.com/MCHMDGALIH).
