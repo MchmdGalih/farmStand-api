@@ -3,9 +3,20 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
+const session = require("express-session");
+const flash = require("connect-flash");
 const methodOverride = require("method-override");
 const Product = require("./models/product");
 const Farm = require("./models/farm");
+
+const sessionOptions = {
+  secret: "thisismysecret",
+  resave: false,
+  saveUninitialized: true,
+};
+
+app.use(session(sessionOptions));
+app.use(flash());
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/farmStandTake2")
@@ -22,6 +33,10 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
+app.use((req, res, next) => {
+  res.locals.messages = req.flash("success");
+  next();
+});
 //! ini untuk merender page di frontend dikarena kan 1 file tidak terpisah fe dan be.
 
 const categories = ["fruit", "vegetable", "dairy"];
@@ -84,7 +99,7 @@ app.delete("/products/:id/delete", async (req, res) => {
 //! ini routenyaa Farm.
 app.get("/farms", async (req, res) => {
   const farms = await Farm.find({});
-  res.render("farms/index", { farms });
+  res.render("farms/index", { farms, messages: req.flash("success") });
 });
 
 app.get("/farms/new", (req, res) => {
@@ -99,6 +114,7 @@ app.get("/farms/:id", async (req, res) => {
 app.post("/farms/add", async (req, res) => {
   const newFarm = new Farm(req.body);
   await newFarm.save();
+  req.flash("success", "Successfully added new farm!");
   res.redirect("/farms");
 });
 
